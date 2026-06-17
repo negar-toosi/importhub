@@ -56,6 +56,7 @@ def process_file(import_file: str, import_id_str: str):
                         delivery_date=row["delivery_date"],
                     )
                     uow.flush()
+                    uow.commit()
                     success_count += 1
                 except IntegrityError:
                     uow.rollback()
