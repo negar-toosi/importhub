@@ -1,6 +1,10 @@
+import logging
 import uuid
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 from sqlalchemy.exc import IntegrityError
+from src.app.utils.enums import ImportStatus
 from src.core.celery import celery
 from src.core.uow import create_uow
 from src.app.validator import ShipmentRecordValidator
@@ -9,12 +13,9 @@ from src.app.validator import ShipmentRecordValidator
 @celery.task
 def process_file(import_file: str, import_id_str: str):
     import_id = uuid.UUID(import_id_str)
-
     with create_uow() as uow:
         try:
             uow.import_repo.set_processing(import_id)
-            uow.commit()
-
             df = pd.read_excel(import_file)
             success_count = 0
             failed_rows = set()
@@ -72,10 +73,10 @@ def process_file(import_file: str, import_id_str: str):
                 failed_count=len(failed_rows),
             )
             uow.commit()
-
-        except Exception:
+            logger.info("finish work")
+        except Exception as ex:
             uow.rollback()
             with create_uow() as error_uow:
                 error_uow.import_repo.set_failed(import_id)
                 error_uow.commit()
-            raise
+            raise ex
