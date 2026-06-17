@@ -18,7 +18,7 @@ class ShipmentRecord(SQLModel, table=True):
     status: ShipmentStatus
     delivery_date: datetime.date = Field(default_factory=datetime.date.today)
     created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.now(),
+        default_factory=datetime.datetime.now,
     )
     updated_at: Optional[datetime.datetime] = Field(
         sa_column=Column(DateTime(), onupdate=func.now())
@@ -34,8 +34,16 @@ class Import(SQLModel,table=True):
     total_rows: int = Field(default=0, ge=0, sa_column_args=(CheckConstraint("total_rows >= 0"),))
     success_count: int = Field(default=0, ge=0, sa_column_args=(CheckConstraint("success_count >= 0"),))
     failed_count: int = Field(default=0, ge=0, sa_column_args=(CheckConstraint("failed_count >= 0"),))
+    file_path: str
     created_at: datetime.datetime = Field(
         default_factory=datetime.datetime.now,
     )
     finished_at: Optional[datetime.datetime] = Field(default=None)
+
+class ImportError(SQLModel, table=True):
+    __tablename__ = "import_errors"
+    id: int | None = Field(default=None, primary_key=True)
+    import_id: uuid.UUID = Field(foreign_key="imports.id")
+    row_number: int
+    error_message: str
 
