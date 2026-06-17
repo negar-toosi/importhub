@@ -22,7 +22,7 @@ def process_file(import_file: str, import_id_str: str):
 
             for index, row in df.iterrows():
                 row_number = index + 2  # +2: 1-based + header row
-
+                print(f"***************************{row_number}")
                 errors = [
                     ShipmentRecordValidator.shipment_code(row.get("shipment_code")),
                     ShipmentRecordValidator.customer_name(row.get("customer_name")),
@@ -61,11 +61,15 @@ def process_file(import_file: str, import_id_str: str):
                 except IntegrityError:
                     uow.rollback()
                     failed_rows.add(row_number)
+                    print("this is an duplicate error ************************************")
                     uow.import_error_repo.create(
                         import_id=import_id,
                         row_number=row_number,
                         error_message=f"duplicate shipment_code: {row['shipment_code']}",
                     )
+                    uow
+                    print("save into db **************************************************")
+                    
 
             uow.import_repo.set_completed(
                 import_id=import_id,

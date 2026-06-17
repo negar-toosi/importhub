@@ -1,12 +1,10 @@
 import datetime
 from decimal import Decimal
-from sqlmodel import Session
 from src.app.models import ShipmentRecord
 from src.app.utils.enums import ShipmentStatus
-
-
+from src.core.database import SessionDep
 class ShipmentRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: SessionDep):
         self.db = db
 
     def create(

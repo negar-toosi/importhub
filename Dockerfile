@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir --upgrade -r /importhub/requirements.txt
 COPY ./src /importhub/src/
 
 
-CMD ["fastapi", "run", "src/core/main.py", "--port", "8000"]
+CMD ["uvicorn", "src.core.main:app", "--host", "0.0.0.0", "--port", "8000"]

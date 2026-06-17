@@ -1,10 +1,9 @@
 import uuid
-from sqlmodel import Session
 from src.app.models import ImportError
-
+from src.core.database import SessionDep
 
 class ImportErrorRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: SessionDep):
         self.db = db
 
     def create(self, import_id: uuid.UUID, row_number: int, error_message: str) -> None:

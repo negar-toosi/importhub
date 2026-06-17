@@ -6,13 +6,13 @@ import pandas as pd
 
 class ShipmentRecordValidator:
     def shipment_code(shipment_code: Optional[str]):
-        if type(shipment_code) is None:
+        if shipment_code is None:
             return "shipment code is null"
         if type(shipment_code) != str:
             return "shipment code is not a string object"
         
     def customer_name(customer_name: Optional[str]):
-        if type(customer_name) is None:
+        if customer_name is None:
             return "customer name is null"
         if type(customer_name) != str:
             return "customer name is not a string object"
@@ -20,13 +20,13 @@ class ShipmentRecordValidator:
             return "maximum charecter for customer name must be 50"
         
     def origin_city(origin_city: Optional[str]):
-        if type(origin_city) is None:
+        if origin_city is None:
             return "origin city is null"
         if type(origin_city) != str:
             return "origin city is not a string object"
         
     def destination_city(destination_city: Optional[str]):
-        if type(destination_city) is None:
+        if destination_city is None:
             return "destination city is null"
         if type(destination_city) != str:
             return "destination city is not a string object"
@@ -52,6 +52,8 @@ class ShipmentRecordValidator:
     
     def price(value) -> Optional[str]:
         if value is None:
+            return "weight_kg is null"
+        if pd.isna(value):
             return "weight_kg is null"
         if not isinstance(value, (int, float, Decimal)):
             return "weight_kg is not a decimal number"

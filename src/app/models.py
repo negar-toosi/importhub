@@ -2,48 +2,41 @@ import datetime
 from decimal import Decimal
 from typing import Optional
 import uuid
-from sqlmodel import Column, DateTime, Field, SQLModel, func, CheckConstraint
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship, Fore
+from src.core.database import Base
+from sqlalchemy import Column, ForeignKey, Integer, String, Numeric, Enum, Date,DateTime, Uuid, CheckConstraint
 from src.app.utils.enums import ShipmentStatus, ImportStatus
 
 
-class ShipmentRecord(SQLModel, table=True):
+class ShipmentRecord(Base):
     __tablename__ = "shipment_records"
-    id: int | None = Field(default=None, primary_key=True)
-    shipment_code: str = Field(unique=True, index=True)
-    customer_name: str = Field(max_length=50)
-    origin_city: str = Field()
-    destination_city: str = Field()
-    weight_kg: Decimal = Field(max_digits=10, decimal_places=3, gt=0, sa_column_args=(CheckConstraint("weight_kg > 0"),))
-    price: Decimal = Field(max_digits=10, decimal_places=3, ge=0, sa_column_args=(CheckConstraint("price >= 0"),))
-    status: ShipmentStatus
-    delivery_date: datetime.date = Field(default_factory=datetime.date.today)
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.now,
-    )
-    updated_at: Optional[datetime.datetime] = Field(
-        sa_column=Column(DateTime(), onupdate=func.now())
-    )
+    id = Column(Integer, primary_key=True, index=True)
+    shipment_code = Column(String, unique=True, index=True)
+    customer_name =  Column(String, max_length=50)
+    origin_city = Column(String)
+    destination_city = Column(String)
+    weight_kg = Column(Numeric(precision=13, decimal_return_scale=3), CheckConstraint("weight_kg > 0"))
+    price = Column(Numeric(precision=13, decimal_return_scale=3), CheckConstraint("price >= 0"))
+    status = Column(Enum(ShipmentStatus))
+    delivery_date = Column(Date,default_factory=datetime.date.today)
 
-class Import(SQLModel,table=True):
+class Import(Base):
     __tablename__ = "imports"
-    id: uuid.UUID = Field(
-        default_factory=uuid.uuid4,
-        primary_key=True
-    )
-    status: ImportStatus
-    total_rows: int = Field(default=0, ge=0, sa_column_args=(CheckConstraint("total_rows >= 0"),))
-    success_count: int = Field(default=0, ge=0, sa_column_args=(CheckConstraint("success_count >= 0"),))
-    failed_count: int = Field(default=0, ge=0, sa_column_args=(CheckConstraint("failed_count >= 0"),))
-    file_path: str
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.now,
-    )
-    finished_at: Optional[datetime.datetime] = Field(default=None)
+    id = Column(Uuid, default_factory=uuid.uuid4,primary_key=True )
+    status = Column(Enum(ImportStatus))
+    total_rows = Column(Integer, CheckConstraint("total_rows >= 0"), nullable=True)
+    success_count = Column(Integer, CheckConstraint("success_count >= 0"), nullable=True)
+    failed_count = Column(Integer,CheckConstraint("failed_count >= 0"),nullable=True)
+    file_path = Column(String)
+    created_at = Column(DateTime,default_factory=datetime.datetime.now)
+    finished_at = Column(DateTime, nullable=True)
 
-class ImportError(SQLModel, table=True):
+class ImportError(Base):
     __tablename__ = "import_errors"
-    id: int | None = Field(default=None, primary_key=True)
-    import_id: uuid.UUID = Field(foreign_key="imports.id")
+    id : Mapped[int]= mapped_Column(primary_key=True, index=True) # type: ignore
+    import_id: Mapped[Uuid] = mapped_column(ForeignKey("imports"))
+    import: Mapped
     row_number: int
     error_message: str
 
