@@ -1,8 +1,11 @@
 from celery import Celery
-import os 
+import os
+
 
 celery = Celery(
     __name__,
     broker=os.getenv("CELERY_BROKER_URL"),
-    backend=os.getenv("CELERY_BACKEND_URL")
+    backend=os.getenv("CELERY_BACKEND_URL"),
+    include=["src.app.process_import"],
 )
+
