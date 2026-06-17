@@ -6,7 +6,7 @@ import pandas as pd
 
 class ShipmentRecordValidator:
     def shipment_code(shipment_code: Optional[str]):
-        if type(shipment_code) is None or pd.NA:
+        if type(shipment_code) is None:
             return "shipment code is null"
         if type(shipment_code) != str:
             return "shipment code is not a string object"
