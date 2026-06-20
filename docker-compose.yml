@@ -31,7 +31,7 @@ services:
   worker:
     container_name: importhub_worker
     build: .
-    command: celery -A src.core.celery worker --loglevel=info
+    command: celery -A src.infrastructure.celery.setup worker --loglevel=info
     depends_on:
       - redis
       - db
